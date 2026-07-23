@@ -35,7 +35,7 @@ export default function Contact() {
   };
 
   return (
-    <section className="bg-slate-50 py-20 sm:py-28">
+    <section className="bg-slate-50 py-8 sm:py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-xl mx-auto">
           <span className="text-xs font-semibold uppercase tracking-[0.14em] text-amber-600">
