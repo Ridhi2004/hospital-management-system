@@ -166,7 +166,7 @@ export default function Header() {
                     <span className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-amber-500" />
                     About Us
                   </Link>
-                  <Link href="/about/mission-vision" className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-100 hover:text-indigo-950 transition-colors">
+                  <Link href="/about/mission" className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-100 hover:text-indigo-950 transition-colors">
                     <span className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-amber-500" />
                     Mission &amp; Vision
                   </Link>
