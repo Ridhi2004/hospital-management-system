@@ -1,145 +1,158 @@
-import { Target, Eye, Heart, ShieldCheck, Lightbulb, HandHeart } from "lucide-react";
-import Navbar from "../../components/landing/Navbar";
-import Footer from "../../components/landing/Footer";
+'use client';
+import Navbar from '../../components/landing/Navbar';
+import Footer from '../../components/landing/Footer';
 
-const CORE_COMMITMENTS = [
+import { Target, Eye, HeartHandshake, ShieldCheck, Sparkles, Award, Quote } from "lucide-react";
+
+const PILLARS = [
   {
-    icon: Heart,
-    title: "Compassion",
-    description: "We listen before we treat, and we never let a patient feel like a number.",
+    title: "Patient First",
+    desc: "Every decision, from scheduling to treatment planning, starts with what's best for the patient.",
+    icon: HeartHandshake,
   },
   {
+    title: "Clinical Excellence",
+    desc: "Board-certified specialists held to rigorous, continually updated standards of care.",
+    icon: Award,
+  },
+  {
+    title: "Transparency",
+    desc: "Clear communication about diagnoses, costs, and treatment options — no surprises.",
     icon: ShieldCheck,
-    title: "Integrity",
-    description: "Honest diagnoses, transparent costs, and accountability at every step of care.",
   },
   {
-    icon: Lightbulb,
-    title: "Innovation",
-    description: "Adopting proven medical advances so our patients benefit from modern medicine.",
-  },
-  {
-    icon: HandHeart,
-    title: "Equity",
-    description: "Accessible healthcare for every patient, regardless of background or income.",
+    title: "Continuous Innovation",
+    desc: "Investing in modern diagnostics and treatment methods to stay ahead of patient needs.",
+    icon: Sparkles,
   },
 ];
 
-export default function MissionVisionPage() {
+export default function MissionVision() {
   return (
-      <>
-            <Navbar />
+    <>
+    <Navbar />
     <main className="bg-white">
-      {/* Hero */}
-      <section className="bg-indigo-950">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-24 text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-400">
-            Mission &amp; Vision
-          </p>
-          <h1 className="mt-4 font-serif text-4xl sm:text-5xl font-semibold text-white">
-            Why we exist, and where we&apos;re headed
+      {/* Hero - Removed blue background */}
+      <section className="relative overflow-hidden py-12 sm:py-16">
+        <img
+          src="../../images/specialities/6.jpg"
+          alt="Meridian Hospital care team"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/60 to-black/40" />
+        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <span className="text-xs font-semibold uppercase tracking-[0.14em] text-amber-400">Mission &amp; Vision</span>
+          <h1 className="mt-5 font-serif text-4xl sm:text-5xl font-semibold leading-tight text-white">
+            What drives everything we do.
           </h1>
-          <p className="mt-5 max-w-2xl mx-auto text-slate-300 text-base sm:text-lg leading-relaxed">
-            Two statements guide every decision at Meridian Hospital, from how we
-            train our staff to how we design a patient&apos;s first visit.
+          <p className="mt-5 max-w-2xl mx-auto text-base sm:text-lg text-slate-200">
+            Our mission and vision aren't just words on a wall — they shape every
+            appointment, every treatment plan, and every hire we make.
           </p>
         </div>
       </section>
 
       {/* Mission & Vision cards */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 sm:-mt-12 relative z-10 pb-6">
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-xl p-8 sm:p-10">
-            <span className="flex h-12 w-12 items-center justify-center rounded-[12px] bg-amber-500 text-slate-950">
-              <Target size={22} />
-            </span>
-            <h2 className="mt-5 font-serif text-2xl font-semibold text-indigo-950">
-              Our Mission
-            </h2>
-            <p className="mt-4 text-slate-600 leading-relaxed">
-              To deliver safe, compassionate, and evidence-based healthcare to every
-              patient who comes to us, while treating families with the dignity and
-              clarity they deserve during difficult moments. We exist to close the
-              gap between the medical care people need and the care they can
-              actually reach.
-            </p>
-          </div>
-
-          <div className="bg-indigo-950 rounded-2xl border border-indigo-900 shadow-xl p-8 sm:p-10">
-            <span className="flex h-12 w-12 items-center justify-center rounded-[12px] bg-amber-500 text-slate-950">
-              <Eye size={22} />
-            </span>
-            <h2 className="mt-5 font-serif text-2xl font-semibold text-white">
-              Our Vision
-            </h2>
-            <p className="mt-4 text-slate-300 leading-relaxed">
-              To be the region&apos;s most trusted health system: a place where
-              clinical excellence, modern infrastructure, and genuine human care
-              meet, and where every community, urban or rural, has a path to
-              world-class treatment.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Commitments */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
-        <div className="max-w-2xl">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-600">
-            How We Live This Out
-          </p>
-          <h2 className="mt-3 font-serif text-3xl font-semibold text-indigo-950">
-            Our core commitments
-          </h2>
-          <p className="mt-3 text-slate-600 leading-relaxed">
-            A mission statement means little without daily practice behind it.
-            These are the commitments our staff are trained and held accountable to.
-          </p>
-        </div>
-
-        <div className="mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {CORE_COMMITMENTS.map((item) => {
-            const Icon = item.icon;
-            return (
-              <div
-                key={item.title}
-                className="rounded-xl border border-slate-200 p-6 hover:border-amber-400 hover:shadow-md transition-all"
-              >
-                <span className="flex h-11 w-11 items-center justify-center rounded-[10px] bg-slate-100 text-indigo-950">
-                  <Icon size={20} />
-                </span>
-                <h3 className="mt-4 font-serif text-base font-semibold text-indigo-950">
-                  {item.title}
-                </h3>
-                <p className="mt-2 text-sm text-slate-600 leading-relaxed">
-                  {item.description}
-                </p>
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* Quote strip */}
-      <section className="bg-slate-50 border-y border-slate-200">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 text-center">
-          <svg width="40" height="30" viewBox="0 0 40 30" fill="none" className="mx-auto text-amber-500">
-            <path
-              d="M0 30V17.6C0 12.13 1.36 7.6 4.08 4C6.8 0.4 10.44 -1 15 -1V6.4C12.44 6.4 10.44 7.36 9 9.28C7.56 11.2 6.84 13.6 6.84 16.48H15V30H0ZM25 30V17.6C25 12.13 26.36 7.6 29.08 4C31.8 0.4 35.44 -1 40 -1V6.4C37.44 6.4 35.44 7.36 34 9.28C32.56 11.2 31.84 13.6 31.84 16.48H40V30H25Z"
-              fill="currentColor"
+      <section className="py-12 sm:py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-8">
+          <div className="relative overflow-hidden rounded-3xl shadow-lg">
+            <img
+              src="../../images/specialities/2.jpg"
+              alt="Care team consulting a patient"
+              className="h-56 w-full object-cover"
             />
-          </svg>
-          <p className="mt-6 font-serif text-xl sm:text-2xl text-indigo-950 leading-relaxed">
-            Medicine gives us the tools. Compassion decides how we use them. At
-            Meridian, we try never to forget the second part.
+            <div className="p-8 bg-white border border-t-0 border-slate-100">
+              <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-950 text-amber-400">
+                <Target size={22} />
+              </span>
+              <h2 className="mt-5 font-serif text-2xl font-semibold text-indigo-950">Our Mission</h2>
+              <p className="mt-3 text-sm sm:text-base leading-relaxed text-slate-600">
+                To deliver compassionate, accessible, and clinically excellent
+                healthcare to every patient we serve — regardless of background,
+                income, or circumstance — while treating every person who walks
+                through our doors with dignity and respect.
+              </p>
+            </div>
+          </div>
+
+          <div className="relative overflow-hidden rounded-3xl shadow-lg">
+            <img
+              src="../../images/specialities/7.jpg"
+              alt="Modern hospital facility"
+              className="h-56 w-full object-cover"
+            />
+            <div className="p-8 bg-white border border-t-0 border-slate-100">
+              <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-950 text-amber-400">
+                <Eye size={22} />
+              </span>
+              <h2 className="mt-5 font-serif text-2xl font-semibold text-indigo-950">Our Vision</h2>
+              <p className="mt-3 text-sm sm:text-base leading-relaxed text-slate-600">
+                To be the region's most trusted health system — recognized for
+                clinical innovation, ethical integrity, and a measurable, lasting
+                impact on the wellbeing of every community we serve.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Pillars */}
+      <section className="bg-slate-50 py-12 sm:py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-2xl mx-auto text-center">
+            <span className="text-xs font-semibold uppercase tracking-[0.14em] text-amber-600">How We Deliver</span>
+            <div className="mt-3 mx-auto h-[3px] w-14 bg-gradient-to-r from-indigo-950 via-indigo-800 to-amber-500 rounded-full" />
+            <h2 className="mt-5 font-serif text-3xl sm:text-4xl font-semibold leading-tight text-indigo-950">
+              Four pillars behind our promise
+            </h2>
+          </div>
+
+          <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {PILLARS.map((p) => {
+              const Icon = p.icon;
+              return (
+                <div key={p.title} className="rounded-2xl bg-white border border-slate-100 shadow-sm p-6 text-center">
+                  <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-950 text-amber-400">
+                    <Icon size={20} />
+                  </span>
+                  <h3 className="mt-4 font-serif text-lg font-semibold text-indigo-950">{p.title}</h3>
+                  <p className="mt-2 text-sm text-slate-500 leading-relaxed">{p.desc}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Leadership quote - Changed background to dark gradient instead of blue */}
+      <section className="relative overflow-hidden py-12 sm:py-16">
+        <img
+          src="../../images/Hospital.jpg"
+          alt="Background"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/70 to-black/60" />
+        <div className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <Quote size={40} className="mx-auto text-amber-500/40" />
+          <p className="mt-6 font-serif text-xl sm:text-2xl leading-relaxed text-white">
+            "We measure success not in beds filled, but in patients who leave
+            healthier, informed, and treated with the dignity they deserve."
           </p>
-          <p className="mt-4 text-sm font-semibold text-slate-500 uppercase tracking-wide">
-            Meridian Hospital &amp; Health System
-          </p>
+          <div className="mt-6 flex items-center justify-center gap-3.5">
+            <img
+              src="../../images/doctor/1.jpg"
+              alt="Meridian Hospital Director"
+              className="h-12 w-12 rounded-full object-cover border-2 border-amber-500/50"
+            />
+            <div className="text-left">
+              <p className="font-semibold text-white text-sm">Dr. Meera Bhandari</p>
+              <p className="text-xs text-slate-300">Chief Executive Officer</p>
+            </div>
+          </div>
         </div>
       </section>
     </main>
-       <Footer />
-         </>
+    <Footer />
+    </>
   );
 }
