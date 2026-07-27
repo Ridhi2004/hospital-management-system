@@ -63,7 +63,7 @@ export default function Careers() {
         {/* Hero - Removed blue background */}
         <section className="relative overflow-hidden py-12 sm:py-16">
           <img
-            src="https://picsum.photos/seed/meridian-careers-hero/1920/700"
+            src="/images/Hospital.jpg"
             alt="Meridian Hospital staff"
             className="absolute inset-0 h-full w-full object-cover"
           />
@@ -86,7 +86,7 @@ export default function Careers() {
             <div className="grid lg:grid-cols-2 gap-14 items-center">
               <div className="rounded-2xl overflow-hidden shadow-lg">
                 <img
-                  src="https://picsum.photos/seed/meridian-careers-team/900/650"
+                  src="/images/doctor/2.jpg"
                   alt="Meridian staff team"
                   className="w-full h-[380px] sm:h-[440px] object-cover"
                 />
@@ -184,7 +184,7 @@ export default function Careers() {
         {/* CTA - Changed to dark gradient instead of blue */}
         <section className="relative overflow-hidden py-12 sm:py-16">
           <img
-            src="https://picsum.photos/seed/meridian-careers-cta/1920/400"
+            src="/images/doctor/1.jpg"
             alt="Background"
             className="absolute inset-0 h-full w-full object-cover"
           />

@@ -14,31 +14,32 @@ import {
   ArrowUpRight,
 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image"; // Import Next.js Image component for optimization
 
 const FACILITIES = [
   {
     title: "Private & Shared Wards",
     desc: "450+ beds across private rooms, shared wards, and ICU suites.",
     icon: BedDouble,
-    seed: "../../images/specialities/1.jpg",
+    image: "/images/specialities/1.jpg", // Path from public folder
   },
   {
     title: "Advanced Imaging Center",
     desc: "On-site MRI, CT, X-ray, and ultrasound for same-day diagnostics.",
     icon: ScanLine,
-    seed: "../../images/specialities/2.jpg",
+    image: "/images/specialities/2.jpg",
   },
   {
     title: "In-House Laboratory",
     desc: "Full diagnostic lab with rapid turnaround on routine and specialty tests.",
     icon: FlaskConical,
-    seed: "../../images/specialities/3.jpg",
+    image: "/images/specialities/3.jpg",
   },
   {
     title: "24/7 Emergency Wing",
     desc: "Dedicated trauma bay, ambulance bay, and round-the-clock ER staff.",
     icon: Siren,
-    seed: "../../images/specialities/4.jpg",
+    image: "/images/specialities/4.jpg",
   },
 ];
 
@@ -49,15 +50,28 @@ const AMENITIES = [
   { label: "Wheelchair Accessible", icon: Accessibility },
 ];
 
+// Gallery images with their paths
+const GALLERY_IMAGES = [
+  { src: "/images/hospital.jpg" },
+  { src: "/images/specialities/1.jpg" },
+  { src: "/images/specialities/2.jpg" },
+  { src: "/images/specialities/3.jpg" },
+  { src: "/images/specialities/4.jpg" },
+  { src: "/images/specialities/5.jpg" },
+  { src: "/images/specialities/6.jpg" },
+  { src: "/images/specialities/7.jpg" },
+  { src: "/images/specialities/8.jpg" },
+];
+
 export default function Facilities() {
   return (
     <>
       <Navbar />
       <main className="bg-white">
-        {/* Hero - Removed blue background */}
+        {/* Hero */}
         <section className="relative overflow-hidden py-12 sm:py-16">
           <img
-            src="../../images/specialities/4.jpg"
+            src="/images/specialities/4.jpg" // Updated path
             alt="Meridian Hospital facilities"
             className="absolute inset-0 h-full w-full object-cover"
           />
@@ -74,7 +88,7 @@ export default function Facilities() {
           </div>
         </section>
 
-        {/* Facility cards - Reduced padding */}
+        {/* Facility cards */}
         <section className="py-12 sm:py-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid sm:grid-cols-2 gap-6">
@@ -87,7 +101,7 @@ export default function Facilities() {
                   >
                     <div className="relative h-56 overflow-hidden">
                       <img
-                        src={`${f.seed}`}
+                        src={f.image} // Using local image path
                         alt={f.title}
                         className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />
@@ -107,7 +121,7 @@ export default function Facilities() {
           </div>
         </section>
 
-        {/* Amenities - Reduced padding */}
+        {/* Amenities */}
         <section className="bg-slate-50 py-12 sm:py-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mx-auto text-center">
@@ -134,7 +148,7 @@ export default function Facilities() {
           </div>
         </section>
 
-        {/* Gallery - Reduced padding */}
+        {/* Gallery */}
         <section className="py-12 sm:py-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-end justify-between gap-6 mb-10">
@@ -145,16 +159,13 @@ export default function Facilities() {
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              {[
-                "gallery-1", "gallery-2", "gallery-3", "gallery-4",
-                "gallery-5", "gallery-6", "gallery-7", "gallery-8",
-              ].map((seed, i) => (
+              {GALLERY_IMAGES.map((image, i) => (
                 <div
-                  key={seed}
+                  key={i}
                   className={`rounded-xl overflow-hidden ${i === 0 ? "col-span-2 row-span-2" : ""}`}
                 >
                   <img
-                    src={`https://picsum.photos/seed/meridian-${seed}/${i === 0 ? "700/700" : "350/350"}`}
+                    src={image.src} // Using local image path
                     alt="Meridian Hospital facility"
                     className="h-full w-full object-cover aspect-square hover:scale-105 transition-transform duration-500"
                   />
@@ -164,10 +175,10 @@ export default function Facilities() {
           </div>
         </section>
 
-        {/* CTA - Changed to dark gradient instead of blue */}
+        {/* CTA */}
         <section className="relative overflow-hidden py-12 sm:py-16">
           <img
-            src="https://picsum.photos/seed/meridian-cta-bg/1920/400"
+            src="/images/hospital.jpg" // Changed to local image
             alt="Background"
             className="absolute inset-0 h-full w-full object-cover"
           />
