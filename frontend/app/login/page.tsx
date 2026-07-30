@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -15,37 +16,237 @@ import {
   Users,
   CheckCircle2,
   X,
+  AlertCircle,
 } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
 
 type View = "login" | "register" | "forgot";
 
+interface RegisterFormData {
+  username: string;
+  full_name: string;
+  email: string;
+  phone: string;
+  date_of_birth: string;
+  gender: string;
+  password: string;
+  confirm_password: string;
+}
+
+interface ApiError {
+  detail?: string;
+  [key: string]: string | undefined;
+}
+
 export default function AuthPage() {
   const [view, setView] = useState<View>("login");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [resetSent, setResetSent] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  // Register form state
+  const [registerData, setRegisterData] = useState<RegisterFormData>({
+    username: "",
+    full_name: "",
+    email: "",
+    phone: "",
+    date_of_birth: "",
+    gender: "",
+    password: "",
+    confirm_password: "",
+  });
+
+  // Login form state
+  const [loginData, setLoginData] = useState({
+    email: "",
+    password: "",
+    remember: false,
+  });
 
   const goTo = (v: View) => {
     setResetSent(false);
+    setError(null);
+    setSuccessMessage(null);
     setView(v);
   };
 
-  const handleLoginSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // TODO: wire up login
+  const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, type, value, checked } = e.target;
+    setLoginData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
   };
 
-  const handleRegisterSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // TODO: wire up registration
+  const handleRegisterChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setRegisterData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+    // Clear error when user starts typing
+    if (error) setError(null);
   };
 
-  const handleForgotSubmit = (e: React.FormEvent) => {
+  const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setResetSent(true);
-    // TODO: wire up password reset email
+    setError(null);
+    setSuccessMessage(null);
+    setIsLoading(true);
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: loginData.email,
+          password: loginData.password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.detail || data.message || "Login failed");
+      }
+
+      // Store tokens (adjust based on your API response structure)
+      if (data.access && data.refresh) {
+        localStorage.setItem("access_token", data.access);
+        localStorage.setItem("refresh_token", data.refresh);
+        localStorage.setItem("user", JSON.stringify(data.user));
+      }
+
+      setSuccessMessage("Login successful! Redirecting...");
+      
+      // Redirect to dashboard after successful login
+      setTimeout(() => {
+        window.location.href = "/dashboard";
+      }, 1500);
+
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Login failed. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleRegisterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setSuccessMessage(null);
+
+    // Validate passwords match
+    if (registerData.password !== registerData.confirm_password) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    // Validate password length
+    if (registerData.password.length < 8) {
+      setError("Password must be at least 8 characters long");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      // Prepare data for API - exclude confirm_password
+      const apiData = {
+        username: registerData.username,
+        full_name: registerData.full_name,
+        email: registerData.email,
+        phone: registerData.phone,
+        date_of_birth: registerData.date_of_birth,
+        gender: registerData.gender.toUpperCase(), // API expects uppercase
+        password: registerData.password,
+        confirm_password: registerData.confirm_password,
+      };
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/register/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(apiData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        // Handle validation errors from DRF
+        if (typeof data === "object") {
+          const errorMessages = Object.values(data).flat().join(" ");
+          throw new Error(errorMessages || "Registration failed");
+        }
+        throw new Error(data.detail || data.message || "Registration failed");
+      }
+
+      setSuccessMessage("Registration successful! Please check your email to verify your account.");
+      
+      // Clear form
+      setRegisterData({
+        username: "",
+        full_name: "",
+        email: "",
+        phone: "",
+        date_of_birth: "",
+        gender: "",
+        password: "",
+        confirm_password: "",
+      });
+
+      // Redirect to login after 3 seconds
+      setTimeout(() => {
+        goTo("login");
+        setSuccessMessage(null);
+      }, 3000);
+
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Registration failed. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleForgotSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setIsLoading(true);
+
+    const form = e.target as HTMLFormElement;
+    const emailInput = form.querySelector('input[type="email"]') as HTMLInputElement;
+    const email = emailInput?.value || "";
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/password-reset/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.detail || "Failed to send reset link");
+      }
+
+      setResetSent(true);
+      setSuccessMessage("Password reset link sent to your email.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to send reset link. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -146,6 +347,21 @@ export default function AuthPage() {
             </span>
           </Link>
 
+          {/* Error and Success Messages */}
+          {error && (
+            <div className="mb-6 rounded-lg bg-red-50 border border-red-200 p-4 flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-red-700">{error}</p>
+            </div>
+          )}
+
+          {successMessage && (
+            <div className="mb-6 rounded-lg bg-emerald-50 border border-emerald-200 p-4 flex items-start gap-3">
+              <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-emerald-700">{successMessage}</p>
+            </div>
+          )}
+
           {view === "login" && (
             <div>
               <div className="text-center lg:text-left">
@@ -165,8 +381,12 @@ export default function AuthPage() {
                     <input
                       required
                       type="email"
+                      name="email"
+                      value={loginData.email}
+                      onChange={handleLoginChange}
                       placeholder="you@example.com"
-                      className="w-full rounded-lg border border-slate-300 pl-10 pr-3.5 py-2.5 text-sm text-slate-700 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20"
+                      className="w-full rounded-lg border border-slate-300 pl-10 pr-3.5 py-2.5 text-sm text-slate-700 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 disabled:opacity-50"
+                      disabled={isLoading}
                     />
                   </div>
                 </div>
@@ -180,8 +400,12 @@ export default function AuthPage() {
                     <input
                       required
                       type={showPassword ? "text" : "password"}
+                      name="password"
+                      value={loginData.password}
+                      onChange={handleLoginChange}
                       placeholder="Enter your password"
-                      className="w-full rounded-lg border border-slate-300 pl-10 pr-10 py-2.5 text-sm text-slate-700 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20"
+                      className="w-full rounded-lg border border-slate-300 pl-10 pr-10 py-2.5 text-sm text-slate-700 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 disabled:opacity-50"
+                      disabled={isLoading}
                     />
                     <button
                       type="button"
@@ -196,7 +420,14 @@ export default function AuthPage() {
 
                 <div className="flex items-center justify-between">
                   <label className="flex items-center gap-2.5 text-sm text-slate-600">
-                    <input type="checkbox" className="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-amber-500/30" />
+                    <input 
+                      type="checkbox" 
+                      name="remember"
+                      checked={loginData.remember}
+                      onChange={handleLoginChange}
+                      className="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-amber-500/30 disabled:opacity-50"
+                      disabled={isLoading}
+                    />
                     Remember Me
                   </label>
                   <button type="button" onClick={() => goTo("forgot")} className="text-xs font-semibold text-amber-600 hover:text-amber-700">
@@ -206,9 +437,10 @@ export default function AuthPage() {
 
                 <button
                   type="submit"
-                  className="w-full rounded-full bg-gradient-to-r from-amber-500 to-amber-600 px-6 py-3.5 text-sm font-bold text-slate-950 shadow-sm transition-all duration-300 hover:from-amber-400 hover:to-amber-500 active:scale-[0.98]"
+                  disabled={isLoading}
+                  className="w-full rounded-full bg-gradient-to-r from-amber-500 to-amber-600 px-6 py-3.5 text-sm font-bold text-slate-950 shadow-sm transition-all duration-300 hover:from-amber-400 hover:to-amber-500 active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed disabled:active:scale-100"
                 >
-                  Login
+                  {isLoading ? "Please wait..." : "Login"}
                 </button>
               </form>
 
@@ -235,6 +467,25 @@ export default function AuthPage() {
               <form onSubmit={handleRegisterSubmit} className="mt-8 space-y-4">
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500 mb-1.5">
+                    Username
+                  </label>
+                  <div className="relative">
+                    <User size={17} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <input
+                      required
+                      type="text"
+                      name="username"
+                      value={registerData.username}
+                      onChange={handleRegisterChange}
+                      placeholder="Choose a username"
+                      className="w-full rounded-lg border border-slate-300 pl-10 pr-3.5 py-2.5 text-sm text-slate-700 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 disabled:opacity-50"
+                      disabled={isLoading}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500 mb-1.5">
                     Full Name
                   </label>
                   <div className="relative">
@@ -242,8 +493,12 @@ export default function AuthPage() {
                     <input
                       required
                       type="text"
+                      name="full_name"
+                      value={registerData.full_name}
+                      onChange={handleRegisterChange}
                       placeholder="Full legal name"
-                      className="w-full rounded-lg border border-slate-300 pl-10 pr-3.5 py-2.5 text-sm text-slate-700 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20"
+                      className="w-full rounded-lg border border-slate-300 pl-10 pr-3.5 py-2.5 text-sm text-slate-700 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 disabled:opacity-50"
+                      disabled={isLoading}
                     />
                   </div>
                 </div>
@@ -258,8 +513,12 @@ export default function AuthPage() {
                       <input
                         required
                         type="email"
+                        name="email"
+                        value={registerData.email}
+                        onChange={handleRegisterChange}
                         placeholder="you@example.com"
-                        className="w-full rounded-lg border border-slate-300 pl-10 pr-3.5 py-2.5 text-sm text-slate-700 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20"
+                        className="w-full rounded-lg border border-slate-300 pl-10 pr-3.5 py-2.5 text-sm text-slate-700 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 disabled:opacity-50"
+                        disabled={isLoading}
                       />
                     </div>
                   </div>
@@ -272,8 +531,12 @@ export default function AuthPage() {
                       <input
                         required
                         type="tel"
+                        name="phone"
+                        value={registerData.phone}
+                        onChange={handleRegisterChange}
                         placeholder="+977 9800000000"
-                        className="w-full rounded-lg border border-slate-300 pl-10 pr-3.5 py-2.5 text-sm text-slate-700 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20"
+                        className="w-full rounded-lg border border-slate-300 pl-10 pr-3.5 py-2.5 text-sm text-slate-700 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 disabled:opacity-50"
+                        disabled={isLoading}
                       />
                     </div>
                   </div>
@@ -289,7 +552,11 @@ export default function AuthPage() {
                       <input
                         required
                         type="date"
-                        className="w-full rounded-lg border border-slate-300 pl-10 pr-3.5 py-2.5 text-sm text-slate-700 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20"
+                        name="date_of_birth"
+                        value={registerData.date_of_birth}
+                        onChange={handleRegisterChange}
+                        className="w-full rounded-lg border border-slate-300 pl-10 pr-3.5 py-2.5 text-sm text-slate-700 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 disabled:opacity-50"
+                        disabled={isLoading}
                       />
                     </div>
                   </div>
@@ -301,12 +568,15 @@ export default function AuthPage() {
                       <GenderIcon size={17} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
                       <select
                         required
-                        defaultValue=""
-                        className="w-full appearance-none rounded-lg border border-slate-300 pl-10 pr-3.5 py-2.5 text-sm text-slate-700 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20"
+                        name="gender"
+                        value={registerData.gender}
+                        onChange={handleRegisterChange}
+                        className="w-full appearance-none rounded-lg border border-slate-300 pl-10 pr-3.5 py-2.5 text-sm text-slate-700 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 disabled:opacity-50"
+                        disabled={isLoading}
                       >
                         <option value="" disabled>Select gender</option>
-                        <option value="female">Female</option>
                         <option value="male">Male</option>
+                        <option value="female">Female</option>
                         <option value="other">Other</option>
                         <option value="prefer-not-to-say">Prefer not to say</option>
                       </select>
@@ -324,8 +594,12 @@ export default function AuthPage() {
                       <input
                         required
                         type={showPassword ? "text" : "password"}
+                        name="password"
+                        value={registerData.password}
+                        onChange={handleRegisterChange}
                         placeholder="Create password"
-                        className="w-full rounded-lg border border-slate-300 pl-10 pr-9 py-2.5 text-sm text-slate-700 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20"
+                        className="w-full rounded-lg border border-slate-300 pl-10 pr-9 py-2.5 text-sm text-slate-700 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 disabled:opacity-50"
+                        disabled={isLoading}
                       />
                       <button
                         type="button"
@@ -346,8 +620,12 @@ export default function AuthPage() {
                       <input
                         required
                         type={showConfirmPassword ? "text" : "password"}
+                        name="confirm_password"
+                        value={registerData.confirm_password}
+                        onChange={handleRegisterChange}
                         placeholder="Repeat password"
-                        className="w-full rounded-lg border border-slate-300 pl-10 pr-9 py-2.5 text-sm text-slate-700 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20"
+                        className="w-full rounded-lg border border-slate-300 pl-10 pr-9 py-2.5 text-sm text-slate-700 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 disabled:opacity-50"
+                        disabled={isLoading}
                       />
                       <button
                         type="button"
@@ -363,9 +641,10 @@ export default function AuthPage() {
 
                 <button
                   type="submit"
-                  className="w-full rounded-full bg-gradient-to-r from-amber-500 to-amber-600 px-6 py-3.5 text-sm font-bold text-slate-950 shadow-sm transition-all duration-300 hover:from-amber-400 hover:to-amber-500 active:scale-[0.98]"
+                  disabled={isLoading}
+                  className="w-full rounded-full bg-gradient-to-r from-amber-500 to-amber-600 px-6 py-3.5 text-sm font-bold text-slate-950 shadow-sm transition-all duration-300 hover:from-amber-400 hover:to-amber-500 active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed disabled:active:scale-100"
                 >
-                  Register
+                  {isLoading ? "Creating account..." : "Register"}
                 </button>
               </form>
 
@@ -383,6 +662,7 @@ export default function AuthPage() {
               <button
                 onClick={() => goTo("login")}
                 className="flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-slate-900 mb-6"
+                disabled={isLoading}
               >
                 <ArrowLeft size={16} />
                 Back to sign in
@@ -421,16 +701,18 @@ export default function AuthPage() {
                         required
                         type="email"
                         placeholder="you@example.com"
-                        className="w-full rounded-lg border border-slate-300 pl-10 pr-3.5 py-2.5 text-sm text-slate-700 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20"
+                        className="w-full rounded-lg border border-slate-300 pl-10 pr-3.5 py-2.5 text-sm text-slate-700 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 disabled:opacity-50"
+                        disabled={isLoading}
                       />
                     </div>
                   </div>
 
                   <button
                     type="submit"
-                    className="w-full rounded-full bg-gradient-to-r from-amber-500 to-amber-600 px-6 py-3.5 text-sm font-bold text-slate-950 shadow-sm transition-all duration-300 hover:from-amber-400 hover:to-amber-500 active:scale-[0.98]"
+                    disabled={isLoading}
+                    className="w-full rounded-full bg-gradient-to-r from-amber-500 to-amber-600 px-6 py-3.5 text-sm font-bold text-slate-950 shadow-sm transition-all duration-300 hover:from-amber-400 hover:to-amber-500 active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed disabled:active:scale-100"
                   >
-                    Send Reset Link
+                    {isLoading ? "Sending..." : "Send Reset Link"}
                   </button>
                 </form>
               )}
